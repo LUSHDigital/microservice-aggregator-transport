@@ -232,7 +232,7 @@ abstract class Service implements ServiceInterface
         // Make any alterations based upon the namespace.
         switch ($this->namespace) {
             case "aggregators":
-                $this->name = sprintf('%s-%s', config('app.soa.aggregator_prefix'), $this->name);
+                $this->name = sprintf('%s-%s', config('transport.aggregator_prefix'), $this->name);
                 break;
         }
 

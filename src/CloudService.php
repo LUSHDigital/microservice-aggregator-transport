@@ -76,7 +76,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
      */
     public function getApiGatewayUrl()
     {
-        return sprintf('%s://%s-%s.%s', $this->getProtocol(), config('app.soa.gateway_uri'), config('app.soa.environment'), config('app.soa.domain'));
+        return sprintf('%s://%s-%s.%s', $this->getProtocol(), config('transport.gateway_uri'), config('transport.environment'), config('transport.domain'));
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
         // Make any alterations based upon the namespace.
         switch ($this->namespace) {
             case "aggregators":
-                $this->name = sprintf('%s-%s', config('app.soa.aggregator_prefix'), $this->name);
+                $this->name = sprintf('%s-%s', config('transport.aggregator_prefix'), $this->name);
                 break;
         }
 
