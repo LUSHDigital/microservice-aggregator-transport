@@ -76,6 +76,9 @@ abstract class Service implements ServiceInterface
      */
     public function __construct($branch, $environment, $name, $namespace = 'service')
     {
+        // TODO: Refactor to pull the default values from environment variables
+        // and remove function params. This will tidy up the signature and
+        // reduce need for child class constructors.
         $this->branch = $branch;
         $this->environment = $environment;
         $this->name = $name;
@@ -223,6 +226,10 @@ abstract class Service implements ServiceInterface
             return false;
         }
     }
+
+    // TODO: Implement a 'callAsync' method. This will return a Guzzle promise
+    // which can then be executed in a group by client code.
+    // public function callAsync(callable $onFulfilled = null, callable $onRejected = null) {}
 
     /**
      * {@inheritdoc}
