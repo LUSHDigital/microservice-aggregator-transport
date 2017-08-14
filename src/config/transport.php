@@ -61,7 +61,7 @@ return [
     | The list should be defined with the machine name of the service as the
     | key and an array containing email and password as the value.
     |
-    | The value of the email and password can eulled from an environment
+    | The value of the email and password can pulled from an environment
     | variables in the format SOA_CLOUD_[SERVICE_NAME]_AUTH_[EMAIL|PASSWORD].
     |
     | Example: 'test' => [
