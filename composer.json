@@ -4,7 +4,7 @@
     "type": "library",
     "keywords": ["framework", "laravel", "lumen", "microservice", "aggregator"],
     "require": {
-        "laravel/lumen-framework": "^5.3",
+        "laravel/lumen-framework": "5.3.*",
         "guzzlehttp/guzzle": "^6.2"
     },
     "require-dev": {
@@ -19,7 +19,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "LushDigital\\MicroserviceAggregatorTransport\\": "src/"
+            "LushDigital\\MicroserviceAggregatorTransport\\": "src/",
+            "LushDigital\\MicroserviceAggregatorTransport\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "dev"

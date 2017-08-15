@@ -67,14 +67,6 @@ use App\Models\Thing;
 class MyAwesomeService extends BaseService
 {
     /**
-     * MyAwesomeService constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct(env('SERVICE_BRANCH', 'master'), env('SERVICE_ENVIRONMENT', 'local'), config('transport.services.local.my_awesome_service.uri'));
-    }
-    
-    /**
      * Save a thing.
      *
      * @param Thing $thing
@@ -139,18 +131,6 @@ use App\Models\Thing;
  */
 class MyAwesomeCloudService extends CloudService
 {
-    /**
-     * MyAwesomeService constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct(env('SERVICE_BRANCH', 'master'), env('SERVICE_ENVIRONMENT', 'local'), config('transport.services.cloud.my_awesome_service.uri'));
-   
-        // Set the auth credentials.
-        $this->email = config('transport.auth.my_awesome_service.email');
-        $this->password = config('transport.auth.my_awesome_service.password');
-    }
-    
     /**
      * Save a thing.
      *

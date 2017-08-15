@@ -18,6 +18,18 @@ use Illuminate\Support\Facades\Log;
 abstract class CloudService extends Service implements ServiceInterface, CloudServiceInterface
 {
     /**
+     * MyAwesomeService constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Set the auth credentials.
+        $this->email = config(sprintf('transport.auth.%s.email', $this->name));
+        $this->password = config(sprintf('transport.auth.%s.password', $this->name));
+    }
+
+    /**
      * Email address of an SOA service account to authenticate with.
      *
      * @var string
@@ -131,7 +143,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
         }
 
         // Build the resource uri.
-        $resourceUri = sprintf('%s/%s/%s', $this->namespace, $this->name, $this->getCurrentRequest()->getResource());
+        $resourceUri = sprintf('%s/%s/%s', $this->namespace, $this->uri, $this->getCurrentRequest()->getResource());
 
         // Perform the current request.
         try {
@@ -161,7 +173,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
         // Make any alterations based upon the namespace.
         switch ($this->namespace) {
             case "aggregators":
-                $this->name = sprintf('%s-%s', config('transport.aggregator_prefix'), $this->name);
+                $this->uri = sprintf('%s-%s', config('transport.aggregator_prefix'), $this->uri);
                 break;
         }
 

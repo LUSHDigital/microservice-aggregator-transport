@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\TransferException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Responsible for communication with a service.
@@ -47,11 +48,18 @@ abstract class Service implements ServiceInterface
     protected $name;
 
     /**
+     * The uri of the service.
+     *
+     * @var string
+     */
+    protected $uri;
+
+    /**
      * The namespace of the service.
      *
      * @var string
      */
-    protected $namespace;
+    protected $namespace = 'service';
 
     /**
      * The current request to perform.
@@ -69,20 +77,18 @@ abstract class Service implements ServiceInterface
 
     /**
      * Service constructor.
-     * @param string $branch
-     * @param string $environment
-     * @param string $name
-     * @param string $namespace
      */
-    public function __construct($branch, $environment, $name, $namespace = 'service')
+    public function __construct()
     {
-        // TODO: Refactor to pull the default values from environment variables
-        // and remove function params. This will tidy up the signature and
-        // reduce need for child class constructors.
-        $this->branch = $branch;
-        $this->environment = $environment;
-        $this->name = $name;
-        $this->namespace = $namespace;
+        // Set up the service from config.
+        $this->branch = config('transport.branch');
+        $this->environment = config('transport.environment');
+
+        // Set the service name based on the class name.
+        $this->name = str_replace('\\', '', Str::snake(Str::plural(class_basename($this))));
+
+        // Set the uri.
+        $this->uri = config(sprintf('transport.services.local.%s.uri', $this->name));
 
         // TODO: Implement versioning support.
     }
@@ -219,7 +225,7 @@ abstract class Service implements ServiceInterface
                 'query' => $this->currentRequest->getQuery(),
             ]);
 
-            return json_decode((string)$response->getBody());
+            return json_decode((string) $response->getBody());
         }
         catch (TransferException $e) {
             Log::error(sprintf('An error occurred calling the service. Detail: %s', $e->getMessage()));
@@ -241,12 +247,12 @@ abstract class Service implements ServiceInterface
         // Make any alterations based upon the namespace.
         switch ($this->namespace) {
             case "aggregators":
-                $this->name = sprintf('%s-%s', config('transport.aggregator_prefix'), $this->name);
+                $this->uri = sprintf('%s-%s', config('transport.aggregator_prefix'), $this->uri);
                 break;
         }
 
         // Get the name of the service.
-        $dnsName = sprintf('%s-%s-%s.%s', $this->name, $this->branch, $this->environment, $this->name);
+        $dnsName = sprintf('%s-%s-%s.%s', $this->uri, $this->branch, $this->environment, $this->uri);
 
         // Build the URL to the requested service.
         $serviceURL = sprintf('%s://%s', $this->getProtocol(), $dnsName);
