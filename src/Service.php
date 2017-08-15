@@ -83,6 +83,8 @@ abstract class Service implements ServiceInterface
         $this->environment = $environment;
         $this->name = $name;
         $this->namespace = $namespace;
+
+        // TODO: Implement versioning support.
     }
 
     /**

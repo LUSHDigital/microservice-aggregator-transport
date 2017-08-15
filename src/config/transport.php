@@ -16,6 +16,9 @@ return [
     // The top level domain of the service environment.
     'domain' => env('SOA_DOMAIN'),
 
+    // The CI branch. For example master.
+    'branch' => env('SOA_BRANCH'),
+
     // The CI environment. For example dev or staging.
     'environment' => env('SOA_ENVIRONMENT'),
 
@@ -34,10 +37,14 @@ return [
     | be treated as 'cloud' or 'local', and should be nested appropriately.
     |
     | The list should be defined with the machine name of the service as the
-    | key and the URI as the value. The URI can be pulled from an environment
-    | variable in the format SOA_[CLOUD|LOCAL]_[SERVICE_NAME]_URI.
+    | key and an array containing the URI as the value and optionally a version
+    | as the value. These values can be pulled from an environment
+    | variable in the format SOA_[CLOUD|LOCAL]_[SERVICE_NAME]_[URI|VERSION].
     |
-    | Example: 'test' => env('SOA_CLOUD_TEST_URI')
+    | Example: 'test' => [
+    |              'uri' => env('SOA_CLOUD_TEST_URI'),
+    |              'version' => env('SOA_CLOUD_TEST_VERSION')
+    |          ]
     |
     */
 

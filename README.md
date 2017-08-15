@@ -31,6 +31,19 @@ A 'local' service is used when you can communicate with a service via some kind 
 to call out over the internet to access the service. For example you might be using
 [Kubernetes DNS](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/).
 
+Before you can create a cloud service you need to ensure the following config options are set (explicitly or via environment variables):
+
+* `transport.branch` - The CI branch. For example master.
+* `transport.environment` - The CI environment. For example dev or staging.
+
+Then for each local service, you must define:
+
+* `transport.services.local.SERVICE_NAME.uri` - The URI of the local service.
+
+You can also optionally specify a version of a service:
+
+* `transport.services.local.SERVICE_NAME.version` - The version of the local service.
+
 To create a local service you need to extend the `\LushDigital\MicroserviceAggregatorTransport\Service` class:
 
 ```php
@@ -58,7 +71,7 @@ class MyAwesomeService extends BaseService
      */
     public function __construct()
     {
-        parent::__construct(env('SERVICE_BRANCH', 'master'), env('SERVICE_ENVIRONMENT', 'local'), config('transport.services.local.my_awesome_service'));
+        parent::__construct(env('SERVICE_BRANCH', 'master'), env('SERVICE_ENVIRONMENT', 'local'), config('transport.services.local.my_awesome_service.uri'));
     }
     
     /**
@@ -90,15 +103,20 @@ is accessed via some kind of API gateway and can't be accessed directly.
 
 Before you can create a cloud service you need to ensure the following config options are set (explicitly or via environment variables):
 
+* `transport.branch` - The CI branch. For example master.
 * `transport.domain` - The top level domain of the service environment.
 * `transport.gateway_uri` - The URI of the API gateway.
 * `transport.environment` - The CI environment. For example dev or staging.
 
 Then for each cloud service, you must define:
 
-* `transport.services.cloud.SERVICE_NAME` - The URI of the cloud service.
+* `transport.services.cloud.SERVICE_NAME.uri` - The URI of the cloud service.
 * `transport.auth.SERVICE_NAME.email` - The email address of a service account used to access the cloud service.
 * `transport.auth.SERVICE_NAME.password` - The password of a service account used to access the cloud service.
+
+You can also optionally specify a version of a service:
+                                        
+* `transport.services.cloud.SERVICE_NAME.version` - The version of the cloud service.
 
 Then you can define your service:
 ```php
@@ -126,7 +144,7 @@ class MyAwesomeCloudService extends CloudService
      */
     public function __construct()
     {
-        parent::__construct(env('SERVICE_BRANCH', 'master'), env('SERVICE_ENVIRONMENT', 'local'), config('transport.services.cloud.my_awesome_service'));
+        parent::__construct(env('SERVICE_BRANCH', 'master'), env('SERVICE_ENVIRONMENT', 'local'), config('transport.services.cloud.my_awesome_service.uri'));
    
         // Set the auth credentials.
         $this->email = config('transport.auth.my_awesome_service.email');
