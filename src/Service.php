@@ -62,6 +62,13 @@ abstract class Service implements ServiceInterface
     protected $namespace = 'service';
 
     /**
+     * The version of the service.
+     *
+     * @var int
+     */
+    protected $version = null;
+
+    /**
      * The current request to perform.
      *
      * @var Request
@@ -90,7 +97,8 @@ abstract class Service implements ServiceInterface
         // Set the uri.
         $this->uri = config(sprintf('transport.services.local.%s.uri', $this->name));
 
-        // TODO: Implement versioning support.
+        // Set the version.
+        $this->version = config(sprintf('transport.services.local.%s.version', $this->name));
     }
 
     /**
@@ -171,6 +179,22 @@ abstract class Service implements ServiceInterface
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
+    }
+
+    /**
+     * @return int
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * @param int $version
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
     }
 
     /**
@@ -259,8 +283,14 @@ abstract class Service implements ServiceInterface
                 break;
         }
 
+        // Determine the service namespace to use based on the service version.
+        $serviceNamespace = $this->uri;
+        if (!empty($this->version)) {
+            $serviceNamespace = sprintf("%s-%d", $serviceNamespace, $this->version);
+        }
+
         // Get the name of the service.
-        $dnsName = sprintf('%s-%s-%s.%s', $this->uri, $this->branch, $this->environment, $this->uri);
+        $dnsName = sprintf('%s-%s-%s.%s', $this->uri, $this->branch, $this->environment, $serviceNamespace);
 
         // Build the URL to the requested service.
         $serviceURL = sprintf('%s://%s', $this->getProtocol(), $dnsName);

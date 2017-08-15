@@ -186,13 +186,21 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
         // Build the resource uri.
         $resourceUri = sprintf('%s/%s/%s', $this->namespace, $this->uri, $this->getCurrentRequest()->getResource());
 
+        // Build the headers.
+        $headers = [
+            'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
+        ];
+
+        // Add the version header if required.
+        if (!empty($this->version)) {
+            $headers['x-service-version'] = $this->version;
+        }
+
         // Create the promise.
         return $this->client->requestAsync($this->getCurrentRequest()->getMethod(), $resourceUri, [
             'json' => $this->getCurrentRequest()->getBody(),
             'query' => $this->getCurrentRequest()->getQuery(),
-            'headers' => [
-                'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
-            ]
+            'headers' => $headers
         ])->then($onFulfilled, $onRejected);
     }
 
