@@ -5,6 +5,7 @@
  */
 
 namespace LushDigital\MicroserviceAggregatorTransport;
+use GuzzleHttp\Promise\PromiseInterface;
 
 /**
  * Functionality that all service transport classes must implement.
@@ -35,4 +36,13 @@ interface ServiceInterface
      * @throws \RuntimeException
      */
     public function call();
+
+    /**
+     * Do the current service request, asynchronously.
+     *
+     * @param callable|null $onFulfilled
+     * @param callable|null $onRejected
+     * @return PromiseInterface
+     */
+    public function callAsync(callable $onFulfilled = null, callable $onRejected = null);
 }

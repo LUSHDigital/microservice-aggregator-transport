@@ -168,6 +168,37 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
     /**
      * {@inheritdoc}
      */
+    public function callAsync(callable $onFulfilled = null, callable $onRejected = null)
+    {
+        // Check we have authenticate credentials.
+        if (empty($this->email) || empty($this->password)) {
+            throw new \RuntimeException('Cannot authenticate. Missing credentials');
+        }
+
+        // First we need to authenticate.
+        $authToken = $this->authenticate();
+
+        // Throw an error if we did not get an auth token.
+        if (empty($authToken)) {
+            throw new \RuntimeException('Could not authenticate for cloud service call.');
+        }
+
+        // Build the resource uri.
+        $resourceUri = sprintf('%s/%s/%s', $this->namespace, $this->uri, $this->getCurrentRequest()->getResource());
+
+        // Create the promise.
+        return $this->client->requestAsync($this->getCurrentRequest()->getMethod(), $resourceUri, [
+            'json' => $this->getCurrentRequest()->getBody(),
+            'query' => $this->getCurrentRequest()->getQuery(),
+            'headers' => [
+                'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
+            ]
+        ])->then($onFulfilled, $onRejected);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function dial(Request $request)
     {
         // Make any alterations based upon the namespace.

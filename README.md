@@ -254,3 +254,140 @@ class MyAwesomeController extends BaseController
     }
 }
 ```
+
+### Asynchronous Requests
+In some situations you made need to make multiple requests in quick succession. This can often be improved by running the
+requests concurrently. The package utilises Guzzle promises to do just that. First you need to define a service with
+an asynchronous call:
+
+```php
+<?php
+/**
+ * @file
+ * Contains \App\Services\MyAwesomeService.
+ */
+
+namespace App\Services;
+
+use LushDigital\MicroserviceAggregatorTransport\Service as BaseService;
+use LushDigital\MicroserviceAggregatorTransport\Request;
+use GuzzleHttp\Promise\PromiseInterface;
+use App\Models\Thing;
+
+/**
+ * Transport layer for my awesome service.
+ *
+ * @package App\Services
+ */
+class MyAwesomeService extends BaseService
+{
+    /**
+     * Save a thing.
+     *
+     * @param Thing $thing
+     *     The thing to save.
+     * @param callable|null $onFulfilled
+     *     Function to run on a successful call.
+     * @param callable|null $onRejected
+     *     Function to run on a rejected call. 
+     *
+     * @return PromiseInterface 
+     */
+    public function saveAsyncThing(Thing $thing, callable $onFulfilled = null, callable $onRejected = null)
+    {
+        // Create the request.
+        $request = new Request('things', 'POST', $thing->toArray());
+
+        // Do the request.
+        $this->dial($request);
+        
+        return $this->callAsync($onFulfilled, $onRejected);
+    }
+}
+```
+
+You can then use this in your controller:
+
+```php
+<?php
+/**
+ * @file
+ * Contains \App\Http\Controllers\MyAwesomeController.
+ */
+
+namespace App\Http\Controllers;
+
+use App\Models\Thing;
+use App\Services\MyAwesomeService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Laravel\Lumen\Routing\Controller as BaseController;
+use LushDigital\MicroserviceAggregatorTransport\ServiceInterface;
+use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
+
+class MyAwesomeController extends BaseController
+{
+    /**
+     * Transport layer for my awesome service.
+     *
+     * @var ServiceInterface
+     */
+    protected $myAwesomeService;
+    
+    /**
+     * Transport layer for my awesome cloud service.
+     *
+     * @var ServiceInterface
+     */
+    protected $myAwesomeCloudService;
+    
+    /**
+     * MyAwesomeController constructor.
+     */
+    public function __construct()
+    {
+        $this->myAwesomeService = new MyAwesomeService();
+    }
+    
+    /**
+     * Create a new thing.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function storeThing(Request $request)
+    {
+        // Validate the request.
+        $this->validate($request, ['things.*.name' => 'required|string']);
+        
+        $promises = [];
+        $things = [];
+        foreach ($request->input('things') as $thingData) {
+            // Prepare a thing.
+            $thing = new Thing;
+            $thing->fill($thingData);
+            
+            // Save a thing.
+            $promises[] = $this->myAwesomeService->saveAsyncThing(
+                $thing, 
+                function (ResponseInterface $res) use (&$things) {
+                    // Get the JSON response or exit if none.
+                    $serviceResponse = json_decode($res->getBody());
+                    if (empty($serviceResponse->data)) {
+                        return null;
+                    }
+                
+                    $things[] = $serviceResponse->data->things[0];
+                },
+                function (RequestException $e) {
+                    Log::error(sprintf('Could not get thing. Reason: %s', $e->getMessage()));
+                    return null;
+                }
+            );
+        }
+            
+        return response()->json($things, 200);
+    }
+}
+```

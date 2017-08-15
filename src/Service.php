@@ -235,9 +235,17 @@ abstract class Service implements ServiceInterface
         }
     }
 
-    // TODO: Implement a 'callAsync' method. This will return a Guzzle promise
-    // which can then be executed in a group by client code.
-    // public function callAsync(callable $onFulfilled = null, callable $onRejected = null) {}
+    /**
+     * {@inheritdoc}
+     */
+    public function callAsync(callable $onFulfilled = null, callable $onRejected = null)
+    {
+        // Create the promise.
+        return $this->client->requestAsync($this->currentRequest->getMethod(), $this->currentRequest->getResource(), [
+            'json' => $this->currentRequest->getBody(),
+            'query' => $this->currentRequest->getQuery(),
+        ])->then($onFulfilled, $onRejected);
+    }
 
     /**
      * {@inheritdoc}
