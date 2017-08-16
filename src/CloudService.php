@@ -147,14 +147,12 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
 
         // Perform the current request.
         try {
-            $response = $this->client->request($this->getCurrentRequest()->getMethod(), $resourceUri, [
-                'json' => $this->getCurrentRequest()->getBody(),
-                'query' => $this->getCurrentRequest()->getQuery(),
-                'multipart' => $this->getCurrentRequest()->getMultipartArray(),
-                'headers' => [
-                    'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
-                ]
-            ]);
+            $options = $this->prepareRequestOptions();
+            $options['headers'] = [
+                'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
+            ];
+
+            $response = $this->client->request($this->getCurrentRequest()->getMethod(), $resourceUri, $options);
 
             return json_decode((string) $response->getBody());
         }
@@ -197,13 +195,15 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
             $headers['x-service-version'] = $this->version;
         }
 
+        $options = $this->prepareRequestOptions();
+        $options['headers'] = $headers;
+
         // Create the promise.
-        return $this->client->requestAsync($this->getCurrentRequest()->getMethod(), $resourceUri, [
-            'json' => $this->getCurrentRequest()->getBody(),
-            'query' => $this->getCurrentRequest()->getQuery(),
-            'multipart' => $this->getCurrentRequest()->getMultipartArray(),
-            'headers' => $headers
-        ])->then($onFulfilled, $onRejected);
+        return $this->client->requestAsync(
+            $this->getCurrentRequest()->getMethod(),
+            $resourceUri,
+            $options
+        )->then($onFulfilled, $onRejected);
     }
 
     /**

@@ -246,11 +246,11 @@ abstract class Service implements ServiceInterface
     {
         // Perform the current request.
         try {
-            $response = $this->client->request($this->currentRequest->getMethod(), $this->currentRequest->getResource(), [
-                'json' => $this->currentRequest->getBody(),
-                'query' => $this->currentRequest->getQuery(),
-                'multipart' => $this->currentRequest->getMultipartArray(),
-            ]);
+            $response = $this->client->request(
+                $this->currentRequest->getMethod(),
+                $this->currentRequest->getResource(),
+                $this->prepareRequestOptions()
+            );
 
             return json_decode((string) $response->getBody());
         }
@@ -268,11 +268,11 @@ abstract class Service implements ServiceInterface
     public function callAsync(callable $onFulfilled = null, callable $onRejected = null)
     {
         // Create the promise.
-        return $this->client->requestAsync($this->currentRequest->getMethod(), $this->currentRequest->getResource(), [
-            'json' => $this->currentRequest->getBody(),
-            'query' => $this->currentRequest->getQuery(),
-            'multipart' => $this->currentRequest->getMultipartArray(),
-        ])->then($onFulfilled, $onRejected);
+        return $this->client->requestAsync(
+            $this->currentRequest->getMethod(),
+            $this->currentRequest->getResource(),
+            $this->prepareRequestOptions()
+        )->then($onFulfilled, $onRejected);
     }
 
     /**
@@ -302,5 +302,30 @@ abstract class Service implements ServiceInterface
         // Set up the HTTP client.
         $this->client = new Client(['base_uri' => $serviceURL]);
         $this->currentRequest = $request;
+    }
+
+    /**
+     * Prepare an array of options to use in a Guzzle request.
+     *
+     * @return array
+     */
+    protected function prepareRequestOptions()
+    {
+        // Start with the query.
+        $options = [
+            'query' => $this->getCurrentRequest()->getQuery(),
+        ];
+
+        // Add a json body if present.
+        if (!empty($this->getCurrentRequest()->getBody())) {
+            $options['json'] = $this->getCurrentRequest()->getBody();
+        }
+
+        // Add a multipart if present.
+        if (!empty($this->getCurrentRequest()->getMultipartArray())) {
+            $options['multipart'] = $this->getCurrentRequest()->getMultipartArray();
+        }
+
+        return $options;
     }
 }
