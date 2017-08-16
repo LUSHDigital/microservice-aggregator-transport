@@ -7,7 +7,7 @@
 namespace LushDigital\MicroserviceAggregatorTransport;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -116,7 +116,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
 
             return !empty($response->data->consumer) ? $response->data->consumer->tokens[0]->value : false;
         }
-        catch (TransferException $e) {
+        catch (RequestException $e) {
             Log::error(sprintf('Could not authenticate for cloud service. Reason: %s', $e->getMessage()));
             $this->setLastException($e);
 
@@ -157,7 +157,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
 
             return json_decode((string) $response->getBody());
         }
-        catch (TransferException $e) {
+        catch (RequestException $e) {
             Log::error(sprintf('An error occurred calling the service. Detail: %s', $e->getMessage()));
             $this->setLastException($e);
 

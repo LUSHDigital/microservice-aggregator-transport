@@ -8,7 +8,7 @@ namespace LushDigital\MicroserviceAggregatorTransport;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -78,7 +78,7 @@ abstract class Service implements ServiceInterface
     /**
      * Details of the last error that occurred.
      *
-     * @var TransferException
+     * @var RequestException
      */
     private $lastException;
 
@@ -216,7 +216,7 @@ abstract class Service implements ServiceInterface
     }
 
     /**
-     * @param TransferException $lastException
+     * @param RequestException $lastException
      */
     protected function setLastException($lastException)
     {
@@ -224,7 +224,7 @@ abstract class Service implements ServiceInterface
     }
 
     /**
-     * @return TransferException
+     * @return RequestException
      */
     public function getLastException()
     {
@@ -253,7 +253,7 @@ abstract class Service implements ServiceInterface
 
             return json_decode((string) $response->getBody());
         }
-        catch (TransferException $e) {
+        catch (RequestException $e) {
             Log::error(sprintf('An error occurred calling the service. Detail: %s', $e->getMessage()));
             $this->setLastException($e);
 

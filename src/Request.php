@@ -35,6 +35,13 @@ final class Request
     protected $query = [];
 
     /**
+     * Values to be passed as a multipart request to the service resource.
+     *
+     * @var MultipartRequest[]
+     */
+    protected $multipart = [];
+
+    /**
      * Machine name of the resource of the service.
      *
      * @var string
@@ -48,13 +55,15 @@ final class Request
      * @param string $method
      * @param array $body
      * @param array $query
+     * @param array $multipart
      */
-    public function __construct($resource, $method, array $body = [], array $query = [])
+    public function __construct($resource, $method, array $body = [], array $query = [], array $multipart = [])
     {
         $this->resource = $resource;
         $this->method = $method;
         $this->body = $body;
         $this->query = $query;
+        $this->multipart = $multipart;
     }
 
     /**
@@ -103,6 +112,30 @@ final class Request
     public function setQuery($query)
     {
         $this->query = $query;
+    }
+
+    /**
+     * @return MultipartRequest[]
+     */
+    public function getMultipart()
+    {
+        return $this->multipart;
+    }
+
+    /**
+     * @param MultipartRequest[] $multipart
+     */
+    public function setMultipart(array $multipart)
+    {
+        $this->multipart = $multipart;
+    }
+
+    /**
+     * @param MultipartRequest $multipart
+     */
+    public function addMultipartRequest(MultipartRequest $multipart)
+    {
+        $this->multipart[] = $multipart;
     }
 
     /**
