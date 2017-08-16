@@ -20,6 +20,12 @@ $ composer require lushdigital/microservice-aggregator-transport
 
 Copy the `src/config/transport.php` file into your `config` folder in the root of your app.
 
+Finally add the following line to your `bootstrap/app.php` file:
+
+```php
+$app->configure('transport');
+```
+
 ## Creating a Service
 The first thing you need to do to utilise this package is to create a class to interact with your service.
 
