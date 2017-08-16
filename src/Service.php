@@ -153,7 +153,7 @@ abstract class Service implements ServiceInterface
     {
         // Use the string library to get a name if one is not specified.
         if (empty($this->name)) {
-            return str_replace('\\', '', Str::snake(Str::plural(class_basename($this))));
+            return str_replace('\\', '', Str::snake(class_basename($this)));
         }
 
         return $this->name;
