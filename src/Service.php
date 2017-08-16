@@ -91,14 +91,11 @@ abstract class Service implements ServiceInterface
         $this->branch = config('transport.branch');
         $this->environment = config('transport.environment');
 
-        // Set the service name based on the class name.
-        $this->name = str_replace('\\', '', Str::snake(Str::plural(class_basename($this))));
-
         // Set the uri.
-        $this->uri = config(sprintf('transport.services.local.%s.uri', $this->name));
+        $this->uri = config(sprintf('transport.services.local.%s.uri', $this->getName()));
 
         // Set the version.
-        $this->version = config(sprintf('transport.services.local.%s.version', $this->name));
+        $this->version = config(sprintf('transport.services.local.%s.version', $this->getName()));
     }
 
     /**
@@ -154,6 +151,11 @@ abstract class Service implements ServiceInterface
      */
     public function getName()
     {
+        // Use the string library to get a name if one is not specified.
+        if (empty($this->name)) {
+            return str_replace('\\', '', Str::snake(Str::plural(class_basename($this))));
+        }
+
         return $this->name;
     }
 
