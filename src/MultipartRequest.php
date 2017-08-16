@@ -6,12 +6,14 @@
 
 namespace LushDigital\MicroserviceAggregatorTransport;
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Models a multi-part request to a service.
  *
  * @package LushDigital\MicroserviceAggregatorTransport
  */
-final class MultipartRequest
+final class MultipartRequest implements Arrayable
 {
     /**
      * The form field name
@@ -118,5 +120,18 @@ final class MultipartRequest
     public function setFilename($filename)
     {
         $this->filename = $filename;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+            'contents' => $this->contents,
+            'headers' => $this->headers,
+            'filename' => $this->filename,
+        ];
     }
 }

@@ -249,6 +249,7 @@ abstract class Service implements ServiceInterface
             $response = $this->client->request($this->currentRequest->getMethod(), $this->currentRequest->getResource(), [
                 'json' => $this->currentRequest->getBody(),
                 'query' => $this->currentRequest->getQuery(),
+                'multipart' => $this->currentRequest->getMultipartArray(),
             ]);
 
             return json_decode((string) $response->getBody());
@@ -270,6 +271,7 @@ abstract class Service implements ServiceInterface
         return $this->client->requestAsync($this->currentRequest->getMethod(), $this->currentRequest->getResource(), [
             'json' => $this->currentRequest->getBody(),
             'query' => $this->currentRequest->getQuery(),
+            'multipart' => $this->currentRequest->getMultipartArray(),
         ])->then($onFulfilled, $onRejected);
     }
 

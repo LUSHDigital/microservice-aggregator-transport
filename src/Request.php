@@ -139,6 +139,22 @@ final class Request
     }
 
     /**
+     * Get all the current multipart requests as an array.
+     *
+     * @return array
+     */
+    public function getMultipartArray()
+    {
+        $multipartRequests = [];
+
+        foreach ($this->multipart as $multipartRequest) {
+            $multipartRequests[] = $multipartRequest->toArray();
+        }
+
+        return $multipartRequests;
+    }
+
+    /**
      * @return string
      */
     public function getResource()

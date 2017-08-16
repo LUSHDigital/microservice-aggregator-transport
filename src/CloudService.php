@@ -150,6 +150,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
             $response = $this->client->request($this->getCurrentRequest()->getMethod(), $resourceUri, [
                 'json' => $this->getCurrentRequest()->getBody(),
                 'query' => $this->getCurrentRequest()->getQuery(),
+                'multipart' => $this->getCurrentRequest()->getMultipartArray(),
                 'headers' => [
                     'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
                 ]
@@ -200,6 +201,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
         return $this->client->requestAsync($this->getCurrentRequest()->getMethod(), $resourceUri, [
             'json' => $this->getCurrentRequest()->getBody(),
             'query' => $this->getCurrentRequest()->getQuery(),
+            'multipart' => $this->getCurrentRequest()->getMultipartArray(),
             'headers' => $headers
         ])->then($onFulfilled, $onRejected);
     }
