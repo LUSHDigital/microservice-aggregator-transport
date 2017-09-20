@@ -27,6 +27,12 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
         // Set the auth credentials.
         $this->email = config(sprintf('transport.auth.%s.email', $this->getName()));
         $this->password = config(sprintf('transport.auth.%s.password', $this->getName()));
+
+        // Set the uri.
+        $this->uri = config(sprintf('transport.services.cloud.%s.uri', $this->getName()));
+
+        // Set the version.
+        $this->version = config(sprintf('transport.services.cloud.%s.version', $this->getName()));
     }
 
     /**
