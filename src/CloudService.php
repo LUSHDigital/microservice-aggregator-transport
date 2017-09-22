@@ -94,7 +94,7 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
      */
     public function getApiGatewayUrl()
     {
-        if (config('app.soa.environment') == 'staging') {
+        if (config('transport.environment') == 'staging') {
             return sprintf('%s://%s-%s.%s', $this->getProtocol(), config('transport.gateway_uri'), config('transport.environment'), config('transport.domain'));
         } else {
             return sprintf('%s://%s.%s', $this->getProtocol(), config('transport.gateway_uri'), config('transport.domain'));
