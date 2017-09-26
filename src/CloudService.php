@@ -157,10 +157,18 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
 
         // Perform the current request.
         try {
-            $options = $this->prepareRequestOptions();
-            $options['headers'] = [
+            // Build the headers.
+            $headers = [
                 'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
             ];
+
+            // Add the version header if required.
+            if (!empty($this->version)) {
+                $headers['x-service-version'] = $this->version;
+            }
+
+            $options = $this->prepareRequestOptions();
+            $options['headers'] = $headers;
 
             $response = $this->client->request($this->getCurrentRequest()->getMethod(), $resourceUri, $options);
 
