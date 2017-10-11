@@ -73,7 +73,7 @@ abstract class Service implements ServiceInterface
      *
      * @var Request
      */
-    private $currentRequest;
+    protected $currentRequest;
 
     /**
      * Details of the last error that occurred.
@@ -324,6 +324,11 @@ abstract class Service implements ServiceInterface
         // Add a multipart if present.
         if (!empty($this->getCurrentRequest()->getMultipartArray())) {
             $options['multipart'] = $this->getCurrentRequest()->getMultipartArray();
+        }
+
+        // Add headers if present.
+        if (!empty($this->getCurrentRequest()->getHeaders())) {
+            $options['headers'] = $this->getCurrentRequest()->getHeaders();
         }
 
         return $options;

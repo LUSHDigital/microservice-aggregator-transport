@@ -42,6 +42,13 @@ final class Request
     protected $multipart = [];
 
     /**
+     * Values to be passed as headers to the service resource.
+     *
+     * @var array
+     */
+    protected $headers = [];
+
+    /**
      * Machine name of the resource of the service.
      *
      * @var string
@@ -56,14 +63,16 @@ final class Request
      * @param array $body
      * @param array $query
      * @param array $multipart
+     * @param array $headers
      */
-    public function __construct($resource, $method, array $body = [], array $query = [], array $multipart = [])
+    public function __construct($resource, $method, array $body = [], array $query = [], array $multipart = [], array $headers = [])
     {
         $this->resource = $resource;
         $this->method = $method;
         $this->body = $body;
         $this->query = $query;
         $this->multipart = $multipart;
+        $this->headers = $headers;
     }
 
     /**
@@ -168,5 +177,39 @@ final class Request
     public function setResource($resource)
     {
         $this->resource = $resource;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * @param array $headers
+     */
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function getHeader($name)
+    {
+        return $this->headers[$name];
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     */
+    public function setHeader($name, $value)
+    {
+        $this->headers[$name] = $value;
     }
 }
