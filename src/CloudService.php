@@ -157,20 +157,15 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
 
         // Perform the current request.
         try {
-            // Build the headers.
-            $headers = [
-                'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
-            ];
+            // Set the headers.
+            $this->currentRequest->setHeader('Authorization', sprintf('%s %s', 'Bearer', $authToken));
 
             // Add the version header if required.
             if (!empty($this->version)) {
-                $headers['x-service-version'] = $this->version;
+                $this->currentRequest->setHeader('x-service-version', $this->version);
             }
 
-            $options = $this->prepareRequestOptions();
-            $options['headers'] = $headers;
-
-            $response = $this->client->request($this->getCurrentRequest()->getMethod(), $resourceUri, $options);
+            $response = $this->client->request($this->getCurrentRequest()->getMethod(), $resourceUri, $this->prepareRequestOptions());
 
             return json_decode((string) $response->getBody());
         }
@@ -203,24 +198,19 @@ abstract class CloudService extends Service implements ServiceInterface, CloudSe
         // Build the resource uri.
         $resourceUri = sprintf('%s/%s/%s', $this->namespace, $this->uri, $this->getCurrentRequest()->getResource());
 
-        // Build the headers.
-        $headers = [
-            'Authorization' => sprintf('%s %s', 'Bearer', $authToken),
-        ];
+        // Set the headers.
+        $this->currentRequest->setHeader('Authorization', sprintf('%s %s', 'Bearer', $authToken));
 
         // Add the version header if required.
         if (!empty($this->version)) {
-            $headers['x-service-version'] = $this->version;
+            $this->currentRequest->setHeader('x-service-version', $this->version);
         }
-
-        $options = $this->prepareRequestOptions();
-        $options['headers'] = $headers;
 
         // Create the promise.
         return $this->client->requestAsync(
             $this->getCurrentRequest()->getMethod(),
             $resourceUri,
-            $options
+            $this->prepareRequestOptions()
         )->then($onFulfilled, $onRejected);
     }
 
