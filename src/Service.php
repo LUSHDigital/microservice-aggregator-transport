@@ -255,7 +255,20 @@ abstract class Service implements ServiceInterface
             return json_decode((string) $response->getBody());
         }
         catch (RequestException $e) {
-            Log::error(sprintf('An error occurred calling the service. Detail: %s', $e->getMessage()));
+            $message = $e->getMessage();
+
+            // Get the full text of the exception (including stack trace),
+            // and replace the original message (possibly truncated),
+            // with the full text of the entire response body.
+            if (!empty($e->getResponse())) {
+                $message = str_replace(
+                    rtrim($e->getMessage()),
+                    (string) $e->getResponse()->getBody(),
+                    (string) $e
+                );
+            }
+
+            Log::error(sprintf('An error occurred calling the service: %s', $message));
             $this->setLastException($e);
 
             return false;
